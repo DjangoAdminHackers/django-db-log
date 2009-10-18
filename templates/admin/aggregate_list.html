@@ -1,0 +1,129 @@
+{% extends "admin/change_list.html" %}
+{% load adminmedia admin_list i18n ixxy_extras %}
+
+{% comment %}
+    14/10/2009, Tomasz Zielinski
+    Small cleanup
+
+    28/07/2009, Tomasz Zielinski
+    Based on html templates from Django 1.0.2:
+    - django/contrib/admin/templates/admin/change_list.html
+    - django/contrib/admin/templates/admin/change_list_results.html
+    Those templates are licensed under Django license (see: attached LICENSE file).
+    To see what has been changed, use 'diff' tool, although result can be unsatisfactory
+{% endcomment %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">Error Log</a> &rsaquo; Aggregates
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+    <div id="content-main">
+        {% block object-tools %}
+        {% endblock %}
+
+        {% block search %}{% endblock %}
+        {% block date_hierarchy %}{% endblock %}
+
+        {% block filters %}
+        {% endblock %}
+
+        {% block result_list %}
+            <p>
+                Show Errors: 
+                {% for tab in tabs %}
+                    {% ifnotequal forloop.counter active_tab %}
+                        
+                            <a href="?tab={{forloop.counter}}&timespan={{active_timespan}}&rownum={{active_rownum}}">{{tab}}</a>
+                    {% else %}
+                            <strong>{{tab}}</strong>
+                    {% endifnotequal %}
+
+                    {% if not forloop.last %}
+                        &nbsp;|&nbsp;
+                    {% endif %}
+                {% endfor %}
+                </p>
+
+
+                <div id="changelist" class="module">
+                <div id="changelist-filter">
+                    <h2>Filters:</h2>
+                    <h3>Show errors from:</h3>
+                    <ul>
+                    {%for ts in timespans%}
+                        <li>
+                        {%ifnotequal forloop.counter active_timespan %}
+                            <a href="?tab={{active_tab}}&timespan={{forloop.counter}}&rownum={{active_rownum}}">{{ts}}</a>
+                        {%else%}
+                            {{ts}}
+                        {%endifnotequal%}
+                        </li>
+                    {%endfor%}
+                    </ul>
+                </div>
+                {% if results|length_is:"0" %}
+                    <strong><center>No errors: {{active_timespan_description}}</center></strong>
+                {% else %}
+                    <table cellspacing="0" style="margin-top: 10px;">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {%for h in column_headers%}
+                            <th>{{h}}</th>
+                        {%endfor%}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for result in results %}
+                        <tr class="{% cycle 'row1' 'row2' %}">
+                            <td>{{forloop.counter}}.</td>
+                            {% for item in result %}
+                                <td>
+                                    {%if item|contains:"http://" %}
+                                        <a href="{{item}}" target="_blank">{{item}}</a>
+                                    {%else%}
+                                        {%if not item%}
+                                            (unknown)
+                                        {%else%}
+                                            {{item}}
+                                        {%endif%}
+                                    {%endif%}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                {%endif%}
+                </div>
+
+                <div>
+                Show rows:
+
+                {% for r in rownums %}
+                        {%ifnotequal forloop.counter active_rownum %}
+                            <a href="?tab={{active_tab}}&timespan={{active_timespan}}&rownum={{forloop.counter}}">{{r}}</a>
+                        {%else%}
+                            {{r}}
+                        {%endifnotequal%}
+                {%if not forloop.last %} | {%endif%}
+                {%endfor%}
+                </div>
+
+        {% endblock result_list %}
+
+        {% block pagination %}{% endblock %}
+        </div>
+    </div>
+
+{% endblock content %}
