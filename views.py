@@ -1,43 +1,29 @@
 # -*- coding: utf-8
 
-# ----------------------------------------------------------------------
-# Imports
-# ----------------------------------------------------------------------
-
-# Python
 import datetime
 import os
-
 import traceback
 
-# Django
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import connection
 from django.http import HttpResponse
-
 from django.template import RequestContext
 from django.template.loader import get_template
 
-from django.db.models import connection
-
-# ----------------------------------------------------------------------
-# Code
-# ----------------------------------------------------------------------
 
 def get_query_date_clause(num):
     date_clause = ""
 
-    if num == 1: # Today
+    if num == 0: # Today
         date_clause = "AND DATE(datetime) = CURDATE()"
-    elif num == 2: # Yesterday
+    elif num == 1: # Yesterday
         date_clause = "AND DATE(datetime) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)"
-    elif num in [3, 4, 5]:  # last 7, 30, 365 days
-        date_clause = "AND DATE(datetime) >= DATE_SUB(CURDATE(), INTERVAL %d DAY)" % [7, 30, 365][num-3]
+    elif num in [2, 3, 4]:  # last 7, 30, 365 days
+        date_clause = "AND DATE(datetime) >= DATE_SUB(CURDATE(), INTERVAL %d DAY)" % [7, 30, 365][num-2]
 
     return date_clause
 
-# --------------------------------------------
-def coerce_int(input, max_val, min_val=1, default_val=1):
+def coerce_int(input, max_val, min_val=0, default_val=1):
     try:
         ret = max(min_val, min(max_val, int(input)))
     except (ValueError, TypeError):
@@ -46,7 +32,6 @@ def coerce_int(input, max_val, min_val=1, default_val=1):
     return ret
 
 
-# --------------------------------------------
 def view_admin_aggregates_customer(request):
     if not request.user.is_staff:
         return HttpResponse('You are no allowed to browse this page!', status=403)
@@ -56,8 +41,8 @@ def view_admin_aggregates_customer(request):
         max_val=3,
     )
     active_timespan = coerce_int(
-        input=request.GET.get('timespan', 6),
-        max_val=6
+        input=request.GET.get('timespan', 5),
+        max_val=5
     )
     active_rownum = coerce_int(
         input=request.GET.get('rownum', 1),
@@ -87,7 +72,7 @@ def view_admin_aggregates_customer(request):
     cursor.execute(sql_statement % (date_clause, limit_clause)) # No SQL-injection problem + we don't need quoting here, so Python formatting is OK
 
     timespans = ['Today', 'Yesterday', 'Last 7 days', 'Last 30 days', 'Last 365 days', 'All the time']
-    
+
     return HttpResponse(get_template('admin/aggregate_list.html').render(RequestContext(request, {
         'active_tab': active_tab,
         'tabs': ['by requested page', 'by requesting page', 'both',],
@@ -105,5 +90,3 @@ def view_admin_aggregates_customer(request):
         'root_path': '/admin/' # To make Django base template happy and 'Change password'/'Logout/ links work
 
     })))
-
-# -- EOF

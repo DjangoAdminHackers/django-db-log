@@ -42,7 +42,7 @@
                 Show Errors: 
                 {% for tab in tabs %}
                     {% ifnotequal forloop.counter active_tab %}
-                        
+
                             <a href="?tab={{forloop.counter}}&timespan={{active_timespan}}&rownum={{active_rownum}}">{{tab}}</a>
                     {% else %}
                             <strong>{{tab}}</strong>
@@ -60,15 +60,15 @@
                     <h2>Filters:</h2>
                     <h3>Show errors from:</h3>
                     <ul>
-                    {%for ts in timespans%}
+                    {% for ts in timespans %}
                         <li>
-                        {%ifnotequal forloop.counter active_timespan %}
-                            <a href="?tab={{active_tab}}&timespan={{forloop.counter}}&rownum={{active_rownum}}">{{ts}}</a>
-                        {%else%}
-                            {{ts}}
-                        {%endifnotequal%}
+                        {% ifnotequal forloop.counter0 active_timespan %}
+                            <a href="?tab={{ active_tab }}&timespan={{ forloop.counter0 }}&rownum={{ active_rownum }}">{{ ts }}</a>
+                        {% else %}
+                            {{ ts }}
+                        {% endifnotequal %}
                         </li>
-                    {%endfor%}
+                    {% endfor %}
                     </ul>
                 </div>
                 {% if results|length_is:"0" %}
