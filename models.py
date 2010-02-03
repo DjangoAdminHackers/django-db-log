@@ -12,3 +12,7 @@ class Error(models.Model):
     referrer        = models.URLField(verify_exists=False, null=True, blank=True)
     server_name     = models.CharField(max_length=128, db_index=True)
 
+class Report(models.Model):
+    class Meta:
+        managed = False #Requires Django 1.1
+
