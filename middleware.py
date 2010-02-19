@@ -6,6 +6,8 @@ from django.conf import settings
 from django.http import Http404
 from django.utils.hashcompat import md5_constructor
 
+from django.contrib.redirects.middleware import RedirectFallbackMiddleware
+
 from models import Error
 
 __all__ = ('DBLogMiddleware', 'DBLOG_CATCH_404_ERRORS')
@@ -21,6 +23,9 @@ class DBLogMiddleware(object):
         class_name  = exception.__class__.__name__
         checksum    = md5_constructor(tb_text).hexdigest()
 
+        if self.covered_by_redirect(request):
+            class_name  += '::redirected'
+
         defaults = dict(
             class_name  = class_name,
             message     = getattr(exception, 'message', ''),
@@ -34,3 +39,13 @@ class DBLogMiddleware(object):
             Error.objects.create(**defaults)
         except Exception, exc:
             warnings.warn(unicode(exc))
+
+    def covered_by_redirect(self, request):
+        class A:pass
+        obj = A()
+        obj.status_code = 404
+        status_code = RedirectFallbackMiddleware().process_response(request, obj).status_code
+        if status_code == 301:
+            return True
+        else:
+            return False
