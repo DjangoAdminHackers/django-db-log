@@ -11,6 +11,7 @@ class Error(models.Model):
     url             = models.URLField(verify_exists=False, null=True, blank=True)
     referrer        = models.URLField(verify_exists=False, null=True, blank=True)
     server_name     = models.CharField(max_length=128, db_index=True)
+    redirected      = models.NullBooleanField()
 
 class Report(models.Model):
     class Meta:

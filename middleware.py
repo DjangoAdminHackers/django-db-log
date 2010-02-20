@@ -5,7 +5,6 @@ import warnings
 from django.conf import settings
 from django.http import Http404
 from django.utils.hashcompat import md5_constructor
-
 from django.contrib.redirects.middleware import RedirectFallbackMiddleware
 
 from models import Error
@@ -22,9 +21,10 @@ class DBLogMiddleware(object):
         tb_text     = traceback.format_exc()
         class_name  = exception.__class__.__name__
         checksum    = md5_constructor(tb_text).hexdigest()
+        redirected  = False
 
         if self.covered_by_redirect(request):
-            class_name  += '::redirected'
+            redirected = True
 
         defaults = dict(
             class_name  = class_name,
@@ -33,6 +33,7 @@ class DBLogMiddleware(object):
             referrer    = request.META.get("HTTP_REFERER", None),
             server_name = server_name,
             traceback   = tb_text,
+            redirected  = redirected,
         )
 
         try:
