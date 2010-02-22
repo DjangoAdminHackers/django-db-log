@@ -54,7 +54,6 @@
                 {% endfor %}
                 </p>
 
-
                 <div id="changelist" class="module">
                 <div id="changelist-filter">
                     <h2>Filters:</h2>
@@ -65,12 +64,25 @@
                         {% ifnotequal forloop.counter0 active_timespan %}
                             <a href="?tab={{ active_tab }}&timespan={{ forloop.counter0 }}&rownum={{ active_rownum }}">{{ ts }}</a>
                         {% else %}
-                            {{ ts }}
+                            {{ts}}
                         {% endifnotequal %}
                         </li>
                     {% endfor %}
                     </ul>
+                    <h3>Show errors:</h3>
+                    <ul>
+                        <li><a href="">All</a></li>
+                        <li><a href="">Fixed by redirect</a></li>
+                        <li><a href="">Not fixed by redirect</a></li>
+                    </ul>
+                    <h3>Error types:</h3>
+                    <ul>
+                        <li><a href="">All</a></li>
+                        <li><a href="">Fixed by redirect</a></li>
+                        <li><a href="">Not fixed by redirect</a></li>
+                    </ul>
                 </div>
+
                 {% if results|length_is:"0" %}
                     <strong><center>No errors: {{active_timespan_description}}</center></strong>
                 {% else %}
