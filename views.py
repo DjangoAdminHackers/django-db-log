@@ -48,6 +48,10 @@ def view_admin_aggregates_customer(request):
         input=request.GET.get('rownum', 1),
         max_val=7
     )
+    active_redirected = coerce_int(
+        input=request.GET.get('redirected', 1),
+        max_val=3
+    )
 
     # Use pure ORM to be compaible with Django 1.0.x which doesn't support aggregates
     cursor = connection.cursor()
@@ -59,17 +63,24 @@ def view_admin_aggregates_customer(request):
     else:
         limit_clause = "LIMIT %s" % ['25', '50', '100', '200', '500', '1000', 'ALL'][active_rownum-1]
 
+    redirected_choices = ['All', 'True', 'False']
+    verbose_redirected_choices = ['All', 'Yes', 'No']
+    if active_redirected == 1:
+        redirected_clause = ''
+    else:
+        redirected_clause = 'AND redirected = %s' % redirected_choices[active_redirected-1]
+
     if active_tab == 1:
         column_headers = ('Page', 'Num. of errors')
-        sql_statement = r"SELECT url, COUNT(*) AS ct FROM djangodblog_error WHERE class_name='Http404' %s GROUP BY url ORDER BY ct DESC %s"
+        sql_statement = r"SELECT url, COUNT(*) AS ct FROM djangodblog_error WHERE class_name='Http404' %s %s GROUP BY url ORDER BY ct DESC %s"
     elif active_tab == 2:
         column_headers = ('Incoming link', 'Num. of errors')
-        sql_statement = r"SELECT referrer, COUNT(*) AS ct FROM djangodblog_error WHERE class_name='Http404' %s GROUP BY referrer ORDER BY ct DESC %s"
+        sql_statement = r"SELECT referrer, COUNT(*) AS ct FROM djangodblog_error WHERE class_name='Http404' %s %s GROUP BY referrer ORDER BY ct DESC %s"
     else:  # if active_tab == 3:
         column_headers = ('Page', 'Incoming link', 'Num. of errors')
-        sql_statement = r"SELECT url, referrer, COUNT(*) AS ct FROM djangodblog_error WHERE class_name='Http404' %s GROUP BY url, referrer ORDER BY ct DESC %s"
+        sql_statement = r"SELECT url, referrer, COUNT(*) AS ct FROM djangodblog_error WHERE class_name='Http404' %s %s GROUP BY url, referrer ORDER BY ct DESC %s"
 
-    cursor.execute(sql_statement % (date_clause, limit_clause)) # No SQL-injection problem + we don't need quoting here, so Python formatting is OK
+    cursor.execute(sql_statement % (redirected_clause, date_clause, limit_clause)) # No SQL-injection problem + we don't need quoting here, so Python formatting is OK
 
     timespans = ['Today', 'Yesterday', 'Last 7 days', 'Last 30 days', 'Last 365 days', 'All the time']
 
@@ -83,6 +94,9 @@ def view_admin_aggregates_customer(request):
         
         'active_rownum': active_rownum,
         'rownums': ['25', '50', '100', '200', '500', '1000', 'ALL'],
+
+        'active_redirected': active_redirected,
+        'redirected_choices':verbose_redirected_choices, 
 
         'column_headers': column_headers,
         'results': cursor.fetchall(),
