@@ -1,0 +1,60 @@
+{% extends "admin/change_list.html" %}
+{% load adminmedia admin_list i18n ixxy_extras %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    
+    <style type="text/css">
+    
+        #content a {
+            border: 1px solid #ddd;
+            padding: 2px;
+            margin: 3px;
+            display: inline-block;
+            font-size: 110%;
+        }
+    
+        form#create_redirect input[type=text] {
+            width: 500px;
+            padding: 5px;
+        }
+        
+        form#create_redirect table tr:first-child {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">Error Log</a> &rsaquo; Create Redirect
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    {% if new_url %}
+        <p>Google data suggests that <a href="{{full_site_url}}{{ new_url }}" target="_blank">{{ new_url }}</a> might be a good substitute for the broken link: {{ old_url }}</p>
+        <p>if this looks OK then just click 'Create Redirect' below.</p>
+        {% if suggested_urls %}
+            <p>Other suggestions (use copy and paste):</p>
+            <ul>
+                {% for url in suggested_urls %}
+                    <li><a href="{{full_site_url}}{{ url }}" target="_blank">{{ url }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+    {% endif %}
+    <form method = "POST" action=".?next={{next}}" id="create_redirect">
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Create Redirect" />
+    </form>
+{% endblock content %}

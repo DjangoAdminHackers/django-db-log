@@ -18,7 +18,7 @@
 {% if not is_popup %}
     {% block breadcrumbs %}
         <div class="breadcrumbs">
-            <a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">Error Log</a> &rsaquo; Aggregates
+            <a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">Error Log</a> &rsaquo; Broken Link Error Report
         </div>
     {% endblock %}
 {% endif %}
@@ -38,8 +38,10 @@
         {% endblock %}
 
         {% block result_list %}
-            <p>
-                Show Errors: 
+            <div id="changelist" class="module">
+                
+            <div>
+                <p>Show Errors: 
                 {% for tab in tabs %}
                     {% ifnotequal forloop.counter active_tab %}
 
@@ -52,89 +54,96 @@
                         &nbsp;|&nbsp;
                     {% endif %}
                 {% endfor %}
-                </p>
-
-                <div id="changelist" class="module">
+                <br><br></p>
+            </div>
+                
                 <div id="changelist-filter">
                     <h2>Filters:</h2>
                     <h3>Show errors from:</h3>
                     <ul>
-                    {% for ts in timespans %}
-                        <li>
-                        {% ifnotequal forloop.counter0 active_timespan %}
-                            <a href="?tab={{ active_tab }}&timespan={{ forloop.counter0 }}&rownum={{ active_rownum }}&redirected={{ active_redirected }}">{{ ts }}</a>
-                        {% else %}
-                            {{ ts }}
-                        {% endifnotequal %}
-                        </li>
-                    {% endfor %}
+                        {% for ts in timespans %}
+                            <li>
+                            {% ifnotequal forloop.counter0 active_timespan %}
+                                <a href="?tab={{ active_tab }}&timespan={{ forloop.counter0 }}&rownum={{ active_rownum }}&redirected={{ active_redirected }}">{{ ts }}</a>
+                            {% else %}
+                                {{ ts }}
+                            {% endifnotequal %}
+                            </li>
+                        {% endfor %}
                     </ul>
                     <h3>Redirected:</h3>
                     <ul>
-                    {% for ts in redirected_choices %}
-                        <li>
-                        {% ifnotequal forloop.counter active_redirected %}
-                            <a href="?tab={{ active_tab }}&timespan={{ active_timespan }}&rownum={{ active_rownum }}&redirected={{ forloop.counter }}">{{ ts }}</a>
-                        {% else %}
-                            {{ ts }}
-                        {% endifnotequal %}
-                        </li>
-                    {% endfor %}
+                        {% for ts in redirected_choices %}
+                            <li>
+                            {% ifnotequal forloop.counter active_redirected %}
+                                <a href="?tab={{ active_tab }}&timespan={{ active_timespan }}&rownum={{ active_rownum }}&redirected={{ forloop.counter }}">{{ ts }}</a>
+                            {% else %}
+                                {{ ts }}
+                            {% endifnotequal %}
+                            </li>
+                        {% endfor %}
                     </ul>
                 </div>
                 {% if results|length_is:"0" %}
                     <center><strong>No errors: {{active_timespan_description}}</strong></center>
                 {% else %}
+                                
+                    <!--<div class="actions">
+                        <div id="action_buttons" style="padding: 2px 0 2px 0;"><a href="/admin/djangodblog/create_redirects/">Create Redirects</a>
+                    </div>-->
+                
                     <table cellspacing="0" style="margin-top: 10px;">
-                    <thead>
-                    <tr>
-                        <th></th>
-                        {%for h in column_headers%}
-                            <th>{{h}}</th>
-                        {%endfor%}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for result in results %}
-                        <tr class="{% cycle 'row1' 'row2' %}">
-                            <td>{{forloop.counter}}.</td>
-                            {% for item in result %}
-                                <td>
-                                    {%if item|contains:"http://" %}
-                                        <a href="{{item}}" target="_blank">{{item}}</a>
-                                    {%else%}
-                                        {%if not item%}
-                                            (unknown)
-                                        {%else%}
-                                            {{item}}
-                                        {%endif%}
-                                    {%endif%}
-                                </td>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                {% for h in column_headers %}
+                                    <th>{{h}}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                                <tr class="{% cycle 'row1' 'row2' %}">
+                                    <td>{{forloop.counter}}.</td>
+                                    <td><a href="{{result.0}}" target="_blank">{{result.0}}</a></td>
+                                    {% if active_tab == 3 %}
+                                        <td>
+                                            {% if result.2 %}
+                                                <a href="{{result.2}}" target="_blank">{{result.2}}</a>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    <td>{{result.1}}</td>
+                                    {% if active_tab != 2 %}
+                                        <td>
+                                            {% if result.3 != 1 %}
+                                                <a href="/admin/djangodblog/create_redirect?old_path={{result.0|urlencode}}">Fix with redirect</a>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
                             {% endfor %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
+                        </tbody>
                     </table>
-                {%endif%}
-                </div>
+                {% endif %}
+            </div>
 
-                <div>
+            <div>
                 Show rows:
 
                 {% for r in rownums %}
-                        {%ifnotequal forloop.counter active_rownum %}
-                            <a href="?tab={{active_tab}}&timespan={{active_timespan}}&rownum={{forloop.counter}}&redirected={{ active_redirected }}">{{r}}</a>
-                        {%else%}
-                            {{r}}
-                        {%endifnotequal%}
-                {%if not forloop.last %} | {%endif%}
-                {%endfor%}
-                </div>
+                    {% ifnotequal forloop.counter active_rownum %}
+                        <a href="?tab={{active_tab}}&timespan={{active_timespan}}&rownum={{forloop.counter}}&redirected={{ active_redirected }}">{{r}}</a>
+                    {% else %}
+                        {{r}}
+                    {% endifnotequal %}
+                    {% if not forloop.last %} | {% endif %}
+                {% endfor %}
+            </div>
 
         {% endblock result_list %}
 
         {% block pagination %}{% endblock %}
-        </div>
     </div>
 
 {% endblock content %}
