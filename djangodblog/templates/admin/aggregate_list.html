@@ -83,6 +83,18 @@
                             </li>
                         {% endfor %}
                     </ul>
+                    <h3>Row Numbers:</h3>
+                    <ul>
+                        {% for ts in rownums %}
+                            <li>
+                            {% ifnotequal forloop.counter active_rownum %}
+                                <a href="?tab={{ active_tab }}&timespan={{ active_timespan }}&rownum={{ forloop.counter }}&redirected={{ active_redirected }}">{{ ts }}</a>
+                            {% else %}
+                                {{ ts }}
+                            {% endifnotequal %}
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
                 {% if results|length_is:"0" %}
                     <center><strong>No errors: {{active_timespan_description}}</strong></center>
