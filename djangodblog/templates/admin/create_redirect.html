@@ -53,6 +53,7 @@
     {% endif %}
     <form method = "POST" action=".?next={{next}}" id="create_redirect">
         <table>
+            {% csrf_token %}
             {{ form }}
         </table>
         <input type="submit" value="Create Redirect" />
