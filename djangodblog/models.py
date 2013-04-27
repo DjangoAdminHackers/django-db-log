@@ -1,9 +1,10 @@
+import datetime
+import urlparse
+
 from django import get_version
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from distutils.version import LooseVersion
-
-import datetime
 
 class Error(models.Model):
     class_name = models.CharField(_('type'), max_length=128)
@@ -20,6 +21,20 @@ class Error(models.Model):
     redirected = models.NullBooleanField()
     class Meta:
         verbose_name_plural = "All Errors"
+
+    def message_short(self):
+        if self.message and len(self.message) > 50:
+            return '%s...' % self.message[:50]
+        else:
+            return self.message
+    
+    def path(self):
+        if self.url:
+            try:
+                return urlparse.urlparse(self.url).path
+            except:
+                pass
+        return self.url
 
 class Report(models.Model):
     class Meta:

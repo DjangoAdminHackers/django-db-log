@@ -4,7 +4,7 @@ from models import Report
 
 class ErrorAdmin(admin.ModelAdmin):
     name = 'Tools and Settings'
-    list_display    = ('class_name', 'message', 'datetime', 'url', 'referrer', 'server_name', 'redirected', )
+    list_display    = ('class_name', 'message_short', 'datetime', 'path', 'server_name', 'redirected', )
     list_filter     = ('class_name', 'server_name', 'redirected', )
     date_hierarchy = 'datetime'
     ordering        = ('-datetime',)
