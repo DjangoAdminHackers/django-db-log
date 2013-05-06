@@ -137,35 +137,29 @@ def create_redirect(request):
     
     if request.method == 'POST':
         
-        next = request.GET['next']
+        next = request.GET.get('next', '/admin/djangodblog/report/')
         form = RedirectForm(request.POST)
         if form.is_valid():
-            
             redirect = form.save()
-            
             all_errors = Error.objects.filter(url = FULL_SITE_URL+form.cleaned_data['old_path']).update(redirected = True)
             request.user.message_set.create(message="Successfully created a redirect from %s to %s" % (redirect.old_path, redirect.new_path))
             return HttpResponseRedirect(next)
             
-    else:
-        
-        old_path = request.GET.get('old_path', None)
-        
-        url = ('http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q='+old_path)
-        
-        response = urllib2.urlopen(urllib2.Request(url, None, {'Referer': 'localhost'}))
-        try:
-            results = simplejson.load(response)['responseData']['results']
-            suggested_urls = [trim_host(x['url']) for x in results if x['url'].startswith(FULL_SITE_URL)]
-            new_path = suggested_urls[0]
-        except:
-            new_path = None
-
-        form = RedirectForm(instance = Redirect(
-            old_path=trim_host(old_path),
-            new_path=trim_host(new_path),
-            site=Site.objects.all()[0]),
-        )
+    
+    old_path = request.GET.get('old_path', None)
+    url = ('http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q='+old_path)
+    response = urllib2.urlopen(urllib2.Request(url, None, {'Referer': 'localhost'}))
+    try:
+        results = simplejson.load(response)['responseData']['results']
+        suggested_urls = [trim_host(x['url']) for x in results if x['url'].startswith(FULL_SITE_URL)]
+        new_path = suggested_urls[0]
+    except:
+        new_path = None
+    form = RedirectForm(instance = Redirect(
+        old_path=trim_host(old_path),
+        new_path=trim_host(new_path),
+        site=Site.objects.all()[0]),
+    )
 
     context = {
         'form': form,
