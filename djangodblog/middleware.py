@@ -4,7 +4,10 @@ import warnings
 
 from django.conf import settings
 from django.http import Http404
-from django.utils.hashcompat import md5_constructor
+try:
+    from django.utils.hashcompat import md5_constructor
+except:
+    from hashlib import md5 as md5_constructor
 from django.contrib.redirects.middleware import RedirectFallbackMiddleware
 
 from models import Error
