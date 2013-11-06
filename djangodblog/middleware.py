@@ -1,6 +1,7 @@
 import traceback
 import socket
 import warnings
+import json
 
 from django.conf import settings
 from django.http import Http404
@@ -30,6 +31,7 @@ class DBLogMiddleware(object):
             redirected = True
 
         defaults = dict(
+            path        = request.path,
             class_name  = class_name,
             message     = getattr(exception, 'message', ''),
             url         = request.build_absolute_uri(),
@@ -37,6 +39,8 @@ class DBLogMiddleware(object):
             server_name = server_name,
             traceback   = tb_text,
             redirected  = redirected,
+            post        = json.dumps(request.POST, indent=4),
+            get         = json.dumps(request.GET, indent=4),
         )
 
         try:

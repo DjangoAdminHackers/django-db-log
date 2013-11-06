@@ -7,6 +7,7 @@ import datetime
 
 class Error(models.Model):
     class_name = models.CharField(_('type'), max_length=128)
+    path = models.TextField(max_length=512)
     message = models.TextField()
     traceback = models.TextField()
     datetime = models.DateTimeField(default=datetime.datetime.now)
@@ -18,6 +19,9 @@ class Error(models.Model):
         referrer = models.URLField(null=True, blank=True)
     server_name = models.CharField(max_length=128, db_index=True)
     redirected = models.NullBooleanField()
+    post = models.TextField()
+    get = models.TextField()
+
     class Meta:
         verbose_name_plural = "All Errors"
 
