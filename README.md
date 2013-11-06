@@ -20,6 +20,11 @@ Installation
 
 Then
 
+    ./manage.py syncdb
     ./manage.py migrate
 
+Upgrading from pre-migrations
+-----------------------------
 
+    ./manage.py migrate djangodblog 0001 --fake
+    ./manage.py migrate djangodblog
