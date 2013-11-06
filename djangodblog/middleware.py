@@ -31,6 +31,7 @@ class DBLogMiddleware(object):
             redirected = True
 
         defaults = dict(
+            method      = request.method,
             path        = request.path,
             class_name  = class_name,
             message     = getattr(exception, 'message', ''),
@@ -41,6 +42,7 @@ class DBLogMiddleware(object):
             redirected  = redirected,
             post        = json.dumps(request.POST, indent=4),
             get         = json.dumps(request.GET, indent=4),
+            cookies         = json.dumps(request.COOKIES, indent=4),
         )
 
         try:

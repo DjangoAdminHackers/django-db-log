@@ -9,5 +9,6 @@ class ErrorAdmin(admin.ModelAdmin):
     date_hierarchy = 'datetime'
     ordering        = ('-datetime',)
     search_fields = ('message', 'server_name', 'url', 'referrer',)
+    readonly_fields = ('portable_request',)
     
 admin.site.register(Error, ErrorAdmin)
