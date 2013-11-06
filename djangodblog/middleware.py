@@ -20,7 +20,7 @@ DBLOG_CATCH_404_ERRORS = getattr(settings, 'DBLOG_CATCH_404_ERRORS', False)
 class DBLogMiddleware(object):
     def process_exception(self, request, exception):
         if not DBLOG_CATCH_404_ERRORS and isinstance(exception, Http404):
-            return False
+            return None
         server_name = socket.gethostname()
         tb_text     = traceback.format_exc()
         class_name  = exception.__class__.__name__
