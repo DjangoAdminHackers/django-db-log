@@ -20,12 +20,6 @@ Installation
 
 Then
 
-    ./manage.py syncdb
+    ./manage.py migrate
 
 
-Upgrades
---------
-
-South is not used. Simply run:
-
-    ./manage.py sqlclear djangodblog | ./manage.py dbshell && ./manage.py syncdb
